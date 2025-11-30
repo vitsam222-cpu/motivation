@@ -37,6 +37,8 @@
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       border: 1px solid rgba(255, 255, 255, 0.8);
+      position: relative;
+      overflow: hidden;
     }
 
     .title {
@@ -52,12 +54,12 @@
       color: #6b7280;
       margin-bottom: 18px;
       text-align: center;
+      line-height: 1.5;
     }
 
     .section-title {
       font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
+      letter-spacing: 0.03em;
       color: #9ca3af;
       margin-bottom: 10px;
       text-align: center;
@@ -146,10 +148,61 @@
       font-size: 17px;
       line-height: 1.55;
       color: #111827;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
       padding: 0 6px;
       text-align: center;
       text-wrap: balance;
+    }
+
+    .breath-toggle {
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .breath-toggle-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #6b7280;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .breath-toggle-label input {
+      display: none;
+    }
+
+    .breath-toggle-ui {
+      width: 34px;
+      height: 18px;
+      border-radius: 999px;
+      background: rgba(229, 231, 235, 0.9);
+      position: relative;
+      transition: background 0.18s ease;
+      box-shadow: inset 0 1px 3px rgba(148, 163, 184, 0.5);
+    }
+
+    .breath-toggle-ui::before {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 3px;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      background: white;
+      box-shadow: 0 1px 4px rgba(148, 163, 184, 0.9);
+      transition: transform 0.18s ease;
+    }
+
+    .breath-toggle-label input:checked + .breath-toggle-ui {
+      background: linear-gradient(90deg, #c7d2fe, #a5b4fc);
+    }
+
+    .breath-toggle-label input:checked + .breath-toggle-ui::before {
+      transform: translateX(13px);
     }
 
     .button-primary {
@@ -203,6 +256,76 @@
       text-align: center;
     }
 
+    /* Оверлей дыхания */
+
+    .breath-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, rgba(249, 250, 251, 0.9), rgba(209, 213, 219, 0.7));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      z-index: 20;
+    }
+
+    .breath-overlay.visible {
+      display: flex;
+    }
+
+    .breath-inner {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      padding: 20px 22px 18px;
+      max-width: 320px;
+      width: 86%;
+      text-align: center;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+    }
+
+    .breath-circle {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(156, 163, 175, 0.5);
+      box-shadow: 0 0 0 6px rgba(209, 213, 219, 0.4);
+      background: radial-gradient(circle at top, #eef2ff, #e0f2fe);
+      animation: breathPulse 4.2s ease-in-out infinite;
+    }
+
+    .breath-text {
+      font-size: 15px;
+      margin-bottom: 6px;
+      color: #374151;
+    }
+
+    .breath-note {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    @keyframes breathPulse {
+      0% {
+        transform: scale(0.9);
+        opacity: 0.85;
+      }
+      40% {
+        transform: scale(1.05);
+        opacity: 1;
+      }
+      70% {
+        transform: scale(0.92);
+        opacity: 0.92;
+      }
+      100% {
+        transform: scale(0.9);
+        opacity: 0.85;
+      }
+    }
+
     @media (max-width: 480px) {
       .card {
         padding: 20px 14px 22px;
@@ -228,9 +351,12 @@
   <div class="app">
     <div class="card">
       <div class="title">Мотивация для души</div>
-      <div class="subtitle">Спокойные фразы-поддержки, чтобы мягко настроиться на день.</div>
+      <div class="subtitle">
+        Мягкие фразы поддержки<br>
+        на каждый день.
+      </div>
 
-      <div class="section-title">Выбери свой запрос</div>
+      <div class="section-title">С чем ты сегодня?</div>
 
       <div class="intent-list">
         <button class="intent" data-intent="tired">Выгорел и устал</button>
@@ -242,9 +368,17 @@
       <div class="divider"></div>
 
       <div id="phrase-block" class="phrase-block">
-        <div id="phrase-label" class="phrase-label">Выбери запрос выше, чтобы получить фразу.</div>
+        <div id="phrase-label" class="phrase-label">Выбери состояние выше, и мы подберём фразу.</div>
         <div id="phrase" class="phrase">
           Сделай мягкий вдох, медленный выдох… и выбери то, что откликается именно сейчас.
+        </div>
+
+        <div class="breath-toggle">
+          <label class="breath-toggle-label">
+            <input type="checkbox" id="breath-toggle" checked>
+            <span class="breath-toggle-ui"></span>
+            <span class="breath-toggle-text">Небольшая дыхательная пауза перед фразой</span>
+          </label>
         </div>
 
         <button id="btn" class="button-primary">
@@ -256,6 +390,15 @@
           Можно нажимать несколько раз — фразы меняются в выбранной категории.
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Оверлей дыхания -->
+  <div id="breath-overlay" class="breath-overlay">
+    <div class="breath-inner">
+      <div class="breath-circle"></div>
+      <div id="breath-text" class="breath-text">Сделай мягкий вдох…</div>
+      <div class="breath-note">Три мягких дыхания — и я покажу фразу.</div>
     </div>
   </div>
 
@@ -358,7 +501,7 @@
         "Сделай сегодня хотя бы одну вещь не из «надо», а из «люблю».",
         "Если не знаешь, с чего начать — начни с простого: воды, воздуха, движения.",
         "Ты можешь пересобрать свой день в любой момент — он ещё не определён окончательно.",
-        "Каждый ваш осознанный вдох — это маленький заряд для тела и души.",
+        "Каждый твой осознанный вдох — это маленький заряд для тела и души.",
         "Твоя энергия — ресурс, а не обязанность. Ты можешь распоряжаться ей по-своему.",
         "Позволь себе радоваться маленьким вещам — это тоже топливо.",
         "Сегодня можно быть чуть добрее к себе — это тоже добавит сил.",
@@ -476,9 +619,14 @@
     const phraseEl = document.getElementById("phrase");
     const phraseLabelEl = document.getElementById("phrase-label");
     const btn = document.getElementById("btn");
+    const breathToggle = document.getElementById("breath-toggle");
+    const breathOverlay = document.getElementById("breath-overlay");
+    const breathText = document.getElementById("breath-text");
 
     let currentCategory = null;
     let lastIndexByCategory = {};
+    let breathingEnabled = true;
+    let isBreathing = false;
 
     function getCategoryLabel(key) {
       switch (key) {
@@ -512,7 +660,7 @@
 
     function showRandomPhrase() {
       if (!currentCategory) {
-        phraseLabelEl.textContent = "Сначала выбери запрос выше.";
+        phraseLabelEl.textContent = "Сначала выбери состояние выше.";
         return;
       }
 
@@ -520,6 +668,58 @@
       phraseEl.textContent = newPhrase || "Сегодня слов немного. Просто побудь рядом с собой.";
       phraseLabelEl.textContent = getCategoryLabel(currentCategory);
     }
+
+    function startBreathingThenShowPhrase() {
+      if (!currentCategory) {
+        phraseLabelEl.textContent = "Сначала выбери состояние выше.";
+        return;
+      }
+
+      if (isBreathing) return;
+      isBreathing = true;
+
+      breathOverlay.classList.add("visible");
+      btn.disabled = true;
+
+      const steps = [
+        { text: "Сделай мягкий вдох…", duration: 3000 },
+        { text: "Небольшая пауза…", duration: 2000 },
+        { text: "Медленный выдох…", duration: 3500 },
+
+        { text: "Ещё один мягкий вдох…", duration: 3000 },
+        { text: "Пауза…", duration: 2000 },
+        { text: "Медленный выдох…", duration: 3500 },
+
+        { text: "Последний вдох…", duration: 3000 },
+        { text: "Выдох — и я покажу фразу.", duration: 3500 }
+      ];
+
+      let index = 0;
+
+      function runStep() {
+        if (index >= steps.length) {
+          breathOverlay.classList.remove("visible");
+          isBreathing = false;
+          btn.disabled = false;
+          showRandomPhrase();
+          return;
+        }
+
+        const step = steps[index];
+        breathText.textContent = step.text;
+
+        setTimeout(() => {
+          index++;
+          runStep();
+        }, step.duration);
+      }
+
+      runStep();
+    }
+
+    breathToggle.addEventListener("change", () => {
+      breathingEnabled = breathToggle.checked;
+    });
 
     intentButtons.forEach((button) => {
       button.addEventListener("click", () => {
@@ -534,7 +734,13 @@
       });
     });
 
-    btn.addEventListener("click", showRandomPhrase);
+    btn.addEventListener("click", () => {
+      if (breathingEnabled) {
+        startBreathingThenShowPhrase();
+      } else {
+        showRandomPhrase();
+      }
+    });
   </script>
 </body>
 </html>
