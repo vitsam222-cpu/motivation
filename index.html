@@ -180,3 +180,189 @@
       color: #9ca3af;
       text-align: center;
     }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 20px 14px 22px;
+        border-radius: 18px;
+      }
+
+      .title {
+        font-size: 20px;
+      }
+
+      .intent-list {
+        grid-template-columns: 1fr;
+      }
+
+      .phrase {
+        font-size: 16px;
+        min-height: 90px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <div class="title">Мотивация для души</div>
+      <div class="subtitle">Небольшие фразы-поддержки, чтобы мягко настроиться на день.</div>
+
+      <div class="section-title">Выбери свой запрос</div>
+
+      <div class="intent-list">
+        <button class="intent" data-intent="tired">Выгорел и устал</button>
+        <button class="intent" data-intent="energy">Хочу заряд на весь день</button>
+        <button class="intent" data-intent="motivation">Просто хочу мотивации</button>
+        <button class="intent" data-intent="future">Предсказание на будущее</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <div id="phrase-block" class="phrase-block">
+        <div id="phrase-label" class="phrase-label">Выбери запрос выше, чтобы получить фразу.</div>
+        <div id="phrase" class="phrase">
+          Сделай вдох, выдох… и выбери то, что откликается именно сейчас.
+        </div>
+
+        <button id="btn" class="button-primary">
+          <span class="button-icon">✶</span>
+          <span>Новая фраза</span>
+        </button>
+
+        <div class="note">
+          Можно нажимать несколько раз — фразы будут меняться в выбранной категории.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const categories = {
+      tired: [
+        "Тебе можно быть уставшим. Мир подождёт, пока ты заботишься о себе.",
+        "Сейчас важнее всего не продуктивность, а мягкость к себе.",
+        "Ты уже сделал достаточно. Сейчас можно просто дышать.",
+        "Отдых — это не слабость, а способ сохранить себя.",
+        "Тебе не нужно ничего доказывать. Ты уже имеешь право на паузу.",
+        "Даже если ты выгорел, внутри всё ещё есть тихая искра. Ей просто нужен покой.",
+        "Ты не обязан быть сильным каждый день. Иногда достаточно просто быть.",
+        "Твоё тело и психика не враги — они просят о заботе, а не о ещё одном рывке.",
+        "Иногда лучший шаг вперёд — это один шаг назад и день тишины.",
+        "Ты можешь замедлиться. Мир не рухнет от того, что ты позаботишься о себе."
+      ],
+      energy: [
+        "Сегодня у тебя есть шанс наполнить день тем, что откликается сердцу.",
+        "Каждое твоё действие — маленький вклад в ту жизнь, о которой ты мечтаешь.",
+        "Энергия приходит не из идеальности, а из движения, которое тебе по душе.",
+        "Сделай один небольшой шаг — и день уже станет другим.",
+        "Ты можешь выбрать: реагировать на день или создавать его.",
+        "Сконцентрируйся только на следующем маленьком действии — и энергия подтянется.",
+        "Ты не обязан сделать сегодня всё. Но ты можешь сделать что-то важное.",
+        "Начни с того, что вдохновляет хоть на 5%. Остальное подтянется.",
+        "Пусть сегодняшний день станет экспериментом: что, если ты чуть больше доверишь себе?",
+        "Твоя энергия растёт там, где есть интерес, смысл и честность с собой."
+      ],
+      motivation: [
+        "Сегодня отличный день, чтобы сделать первый шаг.",
+        "Не обязательно быть идеальным — достаточно быть лучше, чем вчера.",
+        "Маленькие шаги каждый день приводят к большим результатам.",
+        "Если не попробуешь — так и не узнаешь, на что ты способен.",
+        "Твоя будущая версия себя скажет спасибо за усилия сегодня.",
+        "Мечты работают, только если работаешь ты.",
+        "Каждое маленькое действие — кирпичик в большом результате.",
+        "Ты можешь больше, чем тебе кажется.",
+        "Ошибки — это не поражение, а обратная связь.",
+        "Начни с малого, но начни.",
+        "Важен не идеальный старт, а постоянное движение.",
+        "Не бойся делать медленные шаги, бойся стоять на месте.",
+        "Лучше сделать неидеально, чем не сделать идеально.",
+        "Твои мысли формируют твою реальность. Выбирай их осознанно.",
+        "Не обесценивай маленькие победы — из них строятся большие.",
+        "Пока ты думаешь, что поздно — кто-то просто начал.",
+        "Никто не видит, сколько ты вложил, но все увидят результат.",
+        "Твоя скорость не важна, если ты не останавливаешься.",
+        "Иногда “ещё один шаг” — это всё, что нужно, чтобы не сдаться.",
+        "У тебя уже есть всё необходимое, чтобы начать."
+      ],
+      future: [
+        "Твоё будущее мягко выстраивается вокруг решений, которые ты принимаешь в свою пользу.",
+        "В ближайшее время в твоей жизни появится больше ясности, чем хаоса.",
+        "Один небольшой честный шаг к себе сейчас откроет большую дверь в будущем.",
+        "Впереди у тебя будут люди и события, которые подтвердят: ты всё это время двигался не зря.",
+        "Предстоящие месяцы принесут больше внутреннего спокойствия, чем ты ожидаешь.",
+        "Твоя жизнь постепенно разворачивается в сторону того, где тебе будет легче дышать.",
+        "То, что сейчас кажется задержкой, может оказаться удачной перенастройкой пути.",
+        "Ты встретишь ситуации, которые напомнят: ты гораздо устойчивее, чем думал.",
+        "Будущее не фиксировано — оно откликается на твою готовность выбирать себя.",
+        "Главное предсказание: если ты продолжишь возвращаться к себе, будущее будет мягким и живым."
+      ]
+    };
+
+    const intentButtons = Array.from(document.querySelectorAll(".intent"));
+    const phraseBlock = document.getElementById("phrase-block");
+    const phraseEl = document.getElementById("phrase");
+    const phraseLabelEl = document.getElementById("phrase-label");
+    const btn = document.getElementById("btn");
+
+    let currentCategory = null;
+    let lastIndexByCategory = {};
+
+    function getCategoryLabel(key) {
+      switch (key) {
+        case "tired":
+          return "Поддержка, когда ты устал";
+        case "energy":
+          return "Заряд на день";
+        case "motivation":
+          return "Мягкая мотивация";
+        case "future":
+          return "Небольшое послание о будущем";
+        default:
+          return "";
+      }
+    }
+
+    function getRandomPhrase(category) {
+      const list = categories[category];
+      if (!list || list.length === 0) return "";
+
+      let newIndex = Math.floor(Math.random() * list.length);
+      const lastIndex = lastIndexByCategory[category];
+
+      if (list.length > 1 && newIndex === lastIndex) {
+        newIndex = (newIndex + 1) % list.length;
+      }
+
+      lastIndexByCategory[category] = newIndex;
+      return list[newIndex];
+    }
+
+    function showRandomPhrase() {
+      if (!currentCategory) {
+        phraseLabelEl.textContent = "Сначала выбери запрос выше.";
+        return;
+      }
+
+      const newPhrase = getRandomPhrase(currentCategory);
+      phraseEl.textContent = newPhrase || "Сегодня слов немного. Просто побудь рядом с собой.";
+      phraseLabelEl.textContent = getCategoryLabel(currentCategory);
+    }
+
+    intentButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const chosen = button.getAttribute("data-intent");
+        currentCategory = chosen;
+
+        intentButtons.forEach((b) => b.classList.remove("intent--active"));
+        button.classList.add("intent--active");
+
+        phraseBlock.classList.add("visible");
+        showRandomPhrase();
+      });
+    });
+
+    btn.addEventListener("click", showRandomPhrase);
+  </script>
+</body>
+</html>
